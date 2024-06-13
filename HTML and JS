@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Infinity</title>
+
+
+</head>
+
+<body>
+
+<div id="container">
+
+    <h1>Contact Manager</h1>
+<div class="menu">
+
+    <button onclick="showAddContactForm()">Add new contact</button>
+    <button onclick="viewContacts()">See your contact list</button>
+
+
+</div>
+
+</div>
+
+<div id="form-container" class="form-container">
+
+    <form id="contact-form" class="form-container">
+
+    <input type="hidden" id="contact-index">
+
+    <label for="name">Name:</label>
+    <input type="text" id="Name" name="Contact">
+
+    <br>
+
+    <label for="phone">Phone number</label>
+    <input type="text" id="Phone">
+
+    <br>
+
+    <label for="email">E-mail</label>
+    <input type="text" id="Mail">
+
+    <br>
+
+    <button type="submit" id="saveBtn">Save Contact</button>
+    <button type="button" onclick="hideForm()">Cancel</button>
+
+</div>
+
+</form>
+
+
+<div id="contact-list" class="contact-list">
+
+
+</div>
+
+
+<script src="./script.js"></script>
+</body>
+</html>
+
+
+>>>>> JS <<<<
+
+  let contacts = []
+
+function loadContacts(){
+    const storedContacts = localStorage.getItem('contacts');
+    if(storedContacts){
+        contacts = JSON.parse(storedContacts); 
+
+    }
+}
+
+function saveContacts(){
+    localStorage.setItem('contacts', JSON.stringify(contacts))
+}
+
+document.addEventListener('DOMContentLoaded', (event)=>{
+
+    loadContacts()
+    viewContacts()
+
+})
+
+document.getElementById('contact-form').addEventListener('submit', function(event){
+    event.preventDefault()
+
+    const index = document.getElementById('contact-index').value
+    const name = document.getElementById('Name').value
+    const phone = document.getElementById('Phone').value
+    const email = document.getElementById('Mail').value
+
+    const contact = {name, phone, email}
+
+    if(index !== ""){
+        contacts[index] = contact
+    }else{
+        contacts.push(contact)
+    }
+
+document.getElementById('contact-form').reset()
+hideForm()
+saveContacts()
+viewContacts()
+})
+
+function showAddContactForm(){
+
+    document.getElementById('form-container').style.display = 'block'
+
+}
+
+function hideForm(){
+
+    document.getElementById('form-container').style.display = 'none'
+
+}
+
+function viewContacts(){
+
+    const contactList = document.getElementById('contact-list')
+    contactList.innerHTML = ''
+
+    contacts.forEach((contact, index)=>{
+        const contactItem = document.createElement('div')
+        contactItem.className = 'contactItem'
+        contactItem.innerHTML = `
+        <span>
+    
+        ${contact.name} - ${contact.phone} - ${contact.email}
+    
+        </span>
+    
+        <span>
+    
+        <button onclick = editContact(${index})>Edit</button>
+        <button onclick = deleteContact(${index})>Delete</button>
+    
+        </span>
+    
+        `
+        contactList.appendChild(contactItem)
+    
+    })
+
+}
+
+function editContact(index){
+
+    document.getElementById('contact-index').value = index
+    document.getElementById('Name').value = contacts[index].name
+    document.getElementById('Phone').value = contacts[index].phone
+    document.getElementById('Mail').value = contacts[index].email
+    showAddContactForm()
+
+}
+
+function deleteContact(index){
+    contacts.splice(index, 1)
+    viewContacts()
+}
+
